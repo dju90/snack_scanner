@@ -6,6 +6,8 @@ import sys
 
 # aliases
 ETH = dpkt.ethernet.Ethernet
+IP  = dpkt.ethernet.ETH_TYPE_IP
+IP6 = dpkt.ethernet.ETH_TYPE_IP6
 ACK = dpkt.tcp.TH_ACK
 SYN = dpkt.tcp.TH_SYN
 
@@ -22,7 +24,7 @@ def run():
 		i += 1
 		try:
 			eth = ETH(buf)
-			if eth.type!=dpkt.ethernet.ETH_TYPE_IP and eth.type!=dpkt.ethernet.ETH_TYPE_IP6:
+			if eth.type!=IP and eth.type!=IP6:
 				continue         
 			ip=eth.data
 			if ip.p!=dpkt.ip.IP_PROTO_TCP:
@@ -33,13 +35,8 @@ def run():
 			if SYN:
 				if not ACK:
 					print "syn"
-					# dec = str(ip.src).strip().split("\x")
-					# print dec
-					# ip_addr = ""
-					# for d in dec:
-					# 	ip_addr += str(int("0x"+str(d)))
 					incr_dict(ip.src, syn_ct)
-				elif ACK:
+				else:
 					incr_dict(ip.dst, syn_ack_ct)				
 		except dpkt.UnpackError:
 			pass
